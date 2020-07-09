@@ -1,0 +1,8 @@
+node_modules
+.env
+.vscode
+serviceAccountKey.json
+pushToDB.js
+db.js
+IO.js
+/Routes/test.js
