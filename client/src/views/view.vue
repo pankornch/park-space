@@ -10,7 +10,9 @@
       </div>
 
       <div class="bg-light">
-        <h2 style="text-align: center; padding: 3rem 0;">{{ data.title_th}}</h2>
+        <h2
+          style="text-align: center; padding: 3rem 0;"
+        >{{ lang === "th" ? data.title_th : data.title_en }}</h2>
         <!--  -->
 
         <div class="container-fluid h-auto px-5 pb-5">
@@ -20,7 +22,7 @@
                 :src="data.image"
                 fluid-grow
                 alt="Fluid-grow image"
-                style="border-radius: 30px;"
+                style="border-radius: 30px; max-height: 22em; oject-fit: cover;"
                 class="shadow-lg"
               ></b-img>
             </div>
@@ -89,10 +91,10 @@ export default {
   },
   created() {
     this.$store.dispatch("getView", this.path);
-    window.scrollTo(0);
+    window.scroll({top: 0});
   },
   computed: {
-    ...mapGetters({ data: "getterView" }),
+    ...mapGetters({ data: "getterView", lang: "getterLang" }),
     loading() {
       if (this.data === "") {
         return true;

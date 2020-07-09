@@ -2,7 +2,7 @@
   <div>
     <background />
     <content-area />
-    <dense-area :api="api" />
+    <dense-area />
     <about />
     <!-- <chat /> -->
   </div>
@@ -23,9 +23,6 @@ export default {
     denseArea,
     about,
     chat
-  },
-  computed: {
-    ...mapGetters({ api: "getterAPI" })
   }
 };
 </script>

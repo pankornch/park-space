@@ -24,7 +24,7 @@
 
         <div style="text-align: center;" class="d-flex justify-content-center">
           <div style="width: 80%">
-            <p class="card-text">{{ item.title_th}}</p>
+            <p class="card-text">{{ lang === "th" ? item.title_th : item.title_en }}</p>
           </div>
         </div>
       </div>
@@ -37,13 +37,11 @@ import { mapGetters } from "vuex";
 export default {
   name: "nearby",
   props: ["distance"],
-  // mounted() {
-  //   this.$store.dispatch("getCoordinate", this.$route.params.id);
-  // },
-  // computed: {
-  //   ...mapGetters({ distance: "getterCoordinate" }),
-  //   ...mapGetters({ lang: "getterLang" })
-  // }
+
+  computed: {
+    ...mapGetters({ lang: "getterLang" })
+  },
+
   destroyed() {
     this.$store.state.view = "";
   }

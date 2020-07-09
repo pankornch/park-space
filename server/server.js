@@ -23,6 +23,7 @@ const { db } = require('./Database/admin');
 const doc = db.collection(process.env.DYNAMIC).doc('ict');
 
 io.on('connection', socket => {
+    // testing
     socket.on('ict', () => {
         doc.onSnapshot(snap => {
             io.emit('query', snap.data());
@@ -40,9 +41,8 @@ io.on('connection', socket => {
             db.collection(process.env.DYNAMIC).onSnapshot(snap => {
                 let res = {};
                 snap.docs.map(doc => res[doc.data().path] = doc.data())
-                const r = [];
-                Object.keys(res).forEach(e => r.push({ path: res[e].path, carIn: res[e].carIn, carOut: res[e].carOut }))
-                io.emit('dense', r);
+
+                io.emit('dense', Object.keys(res).map(e => ({ path: res[e].path, carIn: res[e].carIn, carOut: res[e].carOut, total: res[e].total })));
             })
         })
 

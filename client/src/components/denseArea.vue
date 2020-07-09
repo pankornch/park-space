@@ -1,5 +1,5 @@
 <template>
-  <div style="height: auto; padding: 1rem 0 3rem 0; background-color: #F3F3F3" class="shadow-lg">
+  <div style="height: auto; padding: 1rem 0 3rem 0; background-color: #F3F3F3" class="shadow-lg"> 
     <div class="container">
       <h3 style="text-align: center; text-decoration: underline;">พื้นที่จอดรถยอดนิยม</h3>
       <div class="row mt-5">
@@ -25,7 +25,7 @@
                 <p
                   class="card-text"
                   style="text-align: center;"
-                >{{ item.title_th }}</p>
+                >{{ lang === "th" ? item.title_th : item.title_en }}</p>
               </div>
             </router-link>
           </div>
@@ -46,13 +46,14 @@ export default {
       loading: true
     };
   },
-  props: ["api"],
-  computed: {},
-  mounted() {
-    this.$store.dispatch("getDense", this.api);
-  },
+
   computed: {
-    ...mapGetters({ dense: "getterDense" }),
+    ...mapGetters({
+      dense: "getterDense",
+      lang: "getterLang",
+      api: "getterAPI"
+    }),
+
     denseFactor() {
       let api = this.api;
       let dense = this.dense;
@@ -70,6 +71,9 @@ export default {
     denseFactor(a, b) {
       if (a && b) this.loading = false;
     }
+  },
+  mounted() {
+    if (this.api) this.loading = false;
   }
 };
 </script>

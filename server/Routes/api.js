@@ -2,9 +2,9 @@ const router = require('express').Router();
 const { db } = require('../Database/admin');
 const { query } = require('../Database/ParkingData');
 
-const verifyToken = require('./Auth/verifyToken');;
 
 router.patch('/patch/:path', async (req, res) => {
+
     const param = JSON.parse(req.body.options);
     let payload = Object.keys(param);
 
@@ -18,22 +18,40 @@ router.patch('/patch/:path', async (req, res) => {
 
     let responsed = (await ref.get()).data()
     responsed = responsed[payload]
-    
 
-    let updateData = await ref.update({ [payload]: responsed + param[payload]})
+
+    await ref.update({ [payload]: responsed + param[payload] })
 
     res.send('Ok!!')
 })
 
-router.all('/:path*?', verifyToken, async (req, res) => {
+router.put('/patch/:path', (req, res) => {
+    const [st, dynamic] = req.body.payload;
+    Object.keys(st).forEach(e => {
+        db.collection(process.env.STATIC).doc(st.path).update({
+            [e]: st[e]
+        })
+    })
 
-    const permission = res.permission;
+    Object.keys(dynamic).forEach(e => {
+        db.collection(process.env.DYNAMIC).doc(st.path).update({
+            [e]: dynamic[e]
+        })
+    })
+
+    res.send('')
+})
+
+
+router.all('/:path*?', async (req, res) => {
+
+    // const permission = res.permission;
     const path = req.params.path
     let data = await query();
 
-    if (permission === 'client') {
-        return res.json(client(data, path))
-    }
+
+    res.json(client(data, path))
+
 });
 
 
@@ -73,5 +91,3 @@ function coodinate(cur, data, path) {
 }
 
 module.exports = router;
-
-

@@ -1,64 +1,40 @@
 <template>
   <div>
-    <!-- Header -->
-    <div style=" padding: 2rem 0;" class="d-flex shadow-sm bg-light">
-      <router-link
-        to="/"
-        :class="{'w-75':isLogin, 'w-100':!isLogin}"
-        style="text-align:center; text-decoration: none"
-      >
-        <h1>Home</h1>
-      </router-link>
-
-      <div class="w-50 d-flex justify-content-center align-items-center" v-if="isLogin">
-        <button class="btn btn-danger h-75" @click="logout" style="text-align:center;">Logout</button>
-      </div>
-    </div>
-
-    <!-- content -->
     <div class="container-fluid">
       <b-table
+        striped
         responsive
         hover
-        striped
-        :items="dataLocation"
+        :items="factor"
         :fields="fields"
-        style="text-align: center; height: 75.8vh;"
+        style="text-align: center;"
       >
-        <!-- EDIT BUTTON -->
         <template v-slot:cell(edit)="data">
           <b-button
-            @click="edit(data.index)"
+            @click="edit(data.item.path)"
             v-b-popover.hover.left="'edit : ' + data.item.path"
             variant="info"
           >Edit</b-button>
         </template>
 
-        <!-- IMAGE -->
-
-        <template v-slot:cell(image)="data">
-          <div class="d-flex justify-content-around">
-            <p class="text-break w-50">{{ data.item.image}}</p>
-            <img
-              :src="data.item.image"
-              v-b-popover.hover.left="data.item.path"
-              style="width: 90px;"
-            />
-          </div>
+        <template v-slot:cell(image_)="data">
+          <b-img
+            :src="data.item.image"
+            v-b-popover.hover.left="data.item.path"
+            style="width: 90px;"
+          ></b-img>
         </template>
       </b-table>
-      <!-- end table  -->
     </div>
-     <chat/>
-    <!--  -->
   </div>
 </template>
 
 <script>
 import { mapGetters } from "vuex";
-import chat from './chat'
+import io from "socket.io-client";
+import chat from "./chat";
 export default {
-  components: {chat},
+  components: { chat },
   data() {
     return {
       form: {
@@ -67,7 +43,6 @@ export default {
       },
       fields: [
         { key: "edit", stickyColumn: true },
-        { key: "id", sortable: true },
         "title_th",
         "title_en",
         "path",
@@ -78,17 +53,35 @@ export default {
         { key: "inParking", sortable: true },
         { key: "position.lat", label: "Latitude", sortable: true },
         { key: "position.long", label: "Longitude", sortable: true },
-        "image"
+        "image_"
       ]
     };
   },
   computed: {
-    ...mapGetters({ dataLocation: "getterLocation" }),
-    ...mapGetters({ isLogin: "getterisLogin" })
+    ...mapGetters({ api: "getterAPI", res: "getterDense" }),
+
+    factor() {
+      try {
+        return this.api.map((e, index) => {
+          return {
+            ...e,
+            ...this.res[index],
+            ...{ inParking: this.res[index].carIn - this.res[index].carOut },
+            ...{
+              available:
+                this.res[index].total -
+                (this.res[index].carIn - this.res[index].carOut)
+            }
+          };
+        });
+      } catch (err) {}
+    }
   },
   methods: {
-    edit(index) {
-      const data = this.dataLocation[index]; // obj
+    edit(path) {
+
+      const index = this.factor.indexOf(this.factor.filter(e => e.path === path)[0])
+      const data = this.factor[index]; // obj
       const h = this.$createElement;
       const style = {
         div: "d-flex justify-content-between align-items-center my-1",
@@ -97,13 +90,11 @@ export default {
       // loop in Obj
       // const arr = [];
       // for (let e in data) arr.push({ [e]: data[e] });
-
       const TITLE = `${data.title_th}, ${data.path.toUpperCase()}`;
-
       // Using HTML : h('div', { domProps: { innerHTML: 'Title from <i>HTML<i> string' } })
-
       const SET_HTML = (v, l = null, b = false) => {
         if (!l) l = v;
+
         return h("div", { class: [style.div] }, [
           h("label", l.charAt(0).toUpperCase() + l.slice(1)),
           h("b-form-input", {
@@ -140,22 +131,19 @@ export default {
           }
         });
     },
-
     async setData(data) {
       const VALUE = v => document.getElementById(v).value;
       // STATIC
       let title_th = VALUE("title_th");
       let title_en = VALUE("title_en");
       let path = VALUE("path");
-      let total = VALUE("total");
       let lat = VALUE("lat");
       let long = VALUE("long");
       let image = VALUE("image");
-
-      // INPUT
+      // DYNAMIC
+      let total = VALUE("total");
       let carIn = VALUE("carIn");
       let carOut = VALUE("carOut");
-
       // READ ONLY
       let available = VALUE("available");
       let inParking = VALUE("inParking");
@@ -163,35 +151,20 @@ export default {
 
       await this.$store.dispatch("updateData", [
         {
-          id: parseInt(data.id),
           title_th,
           title_en,
           path,
-          total: parseInt(total),
           lat: parseFloat(lat),
           long: parseFloat(long),
           image
         },
-        { carIn, carOut }
+        { carIn, carOut, total }
       ]);
-      this.$store.dispatch("requestData");
-    },
 
-    login() {
-      this.$store.dispatch("getLogin", ["login", this.form]);
-    },
-
-    logout() {
-      this.form.password = "";
-      this.$store.dispatch("getLogin", ["logout"]);
-      this.$router.push("/");
-    },
-
-  },
-  mounted() {
-    this.$store.dispatch("getVerifyToken");
+      this.$store.dispatch('getAPI');
+    }
   }
 };
 </script>
-<style>
+<style scoped>
 </style>

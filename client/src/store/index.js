@@ -26,7 +26,10 @@ export default new Vuex.Store({
     socket: io(`${URL_IO}`),
     api: '',
     view: '',
-    dense: ''
+    dense: '',
+    lang: localStorage.getItem('lang') ?
+      localStorage.getItem('lang') :
+      localStorage.setItem('lang', "th")
   },
 
   mutations: {
@@ -46,6 +49,11 @@ export default new Vuex.Store({
 
     SET_DENSE(state, data) {
       state.dense = data;
+    },
+
+    SET_LANG(state, lang) {
+      state.lang = lang;
+      localStorage.setItem('lang', lang);
     }
   },
 
@@ -78,6 +86,15 @@ export default new Vuex.Store({
       socket.emit('dense').on('dense', data => {
         context.commit('SET_DENSE', data);
       });
+    },
+
+    setlang(context, lang) {
+      context.commit('SET_LANG', lang);
+    },
+
+    updateData(context, payload) {
+      const [api, dynamic] = payload;
+      axios.put(`${URL}/api/patch/${api.path}`, { payload })
     }
 
   },
@@ -98,6 +115,10 @@ export default new Vuex.Store({
 
     getterDense(state) {
       return state.dense;
+    },
+
+    getterLang(state) {
+      return state.lang;
     }
   },
   modules: {

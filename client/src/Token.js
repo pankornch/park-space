@@ -18,14 +18,15 @@ class Token {
 
             const slp = this.token.split('=');
 
-            axios.post(`http://localhost:5000/auth/verify`, {},
+            axios.post(`http://localhost:5000/auth/login`, {},
                 {
                     headers: { 'auth-token': `${slp[1]}` }
                 })
                 .then(res => {
-                    if (res.data !== 'Success') {
-                        document.cookie = "auth-token=;"
-                    }
+
+                    // if (res.data !== 'Success') {
+                    //     document.cookie = "auth-token=;"
+                    // }
 
                     resolve(res.data)
                 });

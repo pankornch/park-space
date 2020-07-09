@@ -1,7 +1,6 @@
 <template>
   <div>
     <div id="bg"></div>
-
     <!-- Header -->
     <div class="container-fluid">
       <!-- Logo -->
@@ -58,14 +57,9 @@
 import { mapGetters } from "vuex";
 export default {
   methods: {
-    data() {
-      return {
-        lang: location.getItem('lang')
-      }
-    },
     setLang() {
       let setlang = this.lang == 'th' ? 'en' : 'th'
-      this.$store.dispatch('setLang', setlang);
+      this.$store.dispatch('setlang', setlang);
     }
   },
   computed: {

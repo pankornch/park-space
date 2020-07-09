@@ -1,5 +1,5 @@
 <template>
-  <footer class="m-footer">
+  <footer class="m-footer sticky">
     <p>Copyright © 2020 {{email}}. All Rights Reserved</p>
   </footer>
 </template>
@@ -16,12 +16,19 @@ export default {
 
 <style scoped>
 .m-footer {
-  height: 6vh;
+  height: 4vh;
+  width: 100%;
   background-color: black;
   display: flex;
   justify-content: start;
   align-items: center;
 }
+
+.sticky {
+  position: fixed;
+  bottom: 0;
+}
+
 .m-footer p {
   color: white;
   margin: 0 1em;

@@ -16,6 +16,7 @@ export default {
   },
   created() {
     this.$store.dispatch("getAPI");
+    this.$store.dispatch("getDense");
   }
 };
 </script>
